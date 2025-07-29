@@ -2,6 +2,50 @@ import { defineQuery } from "next-sanity";
 
 export const settingsQuery = defineQuery(`*[_type == "settings"][0]`);
 
+export const headerQuery = `
+  *[_type=='header' && slug.current==$slug][0]{
+    "logoUrl": logo.asset->url,
+    links[]{
+      _key,
+      text,
+      linkType,
+      href,
+      page->{slug},
+      post->{slug}
+    }
+  }
+`
+
+
+export const heroQuery = `
+  *[_type == "hero"][0]{
+    heading,
+    description,
+    "imageUrl": image.asset->url,
+    imageDisplayMode,
+    cta { title, url }
+  }
+`
+
+export const categoriesQuery = `
+  *[_type == "category"] | order(title asc){
+    _id,
+    title,
+    "slug": slug.current,
+    description,
+    "thumbnailUrl": thumbnail.asset->url
+  }
+  `
+
+  export const photosByCategorySlugQuery = `
+  *[_type == "photo" && category->slug.current == $slug]{
+    _id,
+    title,
+    "imageUrl": image.asset->url,
+    description
+  }
+`
+
 const postFields = /* groq */ `
   _id,
   "status": select(_originalId in path("drafts.**") => "draft", "published"),
@@ -12,6 +56,16 @@ const postFields = /* groq */ `
   "date": coalesce(date, _updatedAt),
   "author": author->{firstName, lastName, picture},
 `;
+
+// /sanity/lib/queries.ts
+export const servicesQuery = `
+  *[_type == "service"] | order(title asc){
+    _id,
+    title,
+    description,
+    "iconUrl": icon.asset->url
+  }
+`
 
 const linkReference = /* groq */ `
   _type == "link" => {

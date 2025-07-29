@@ -13,6 +13,12 @@ export const link = defineType({
   type: 'object',
   icon: LinkIcon,
   fields: [
+      defineField({
+      name: 'text',        
+      title: 'Link Text',
+      type: 'string',
+      description: 'Text to display for this link (nav/CTA label)',
+    }),
     defineField({
       name: 'linkType',
       title: 'Link Type',
