@@ -5,7 +5,7 @@ export default function Brands() {
         <div className="flex flex-wrap justify-center gap-10 items-center max-w-4xl mx-auto">
           {/* Replace with your logos or just use text */}
           <span className="text-lg font-serif text-gray-700">Vogue</span>
-          <span className="text-lg font-serif text-gray-700">L'Oréal</span>
+          <span className="text-lg font-serif text-gray-700">Sephora</span>
           <span className="text-lg font-serif text-gray-700">NY Times</span>
           {/* ...and so on */}
         </div>
