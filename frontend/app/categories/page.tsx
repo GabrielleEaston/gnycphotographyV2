@@ -1,8 +1,9 @@
+// app/categories/[slug]/page.tsx
 import { sanityFetch } from '@/sanity/lib/live'
 import { photosByCategorySlugQuery } from '@/sanity/lib/queries'
 import Image from 'next/image'
 
-// 1. Define Photo type here or import from types file
+// 1. Define your Photo shape
 type Photo = {
   _id: string
   title: string
@@ -10,11 +11,16 @@ type Photo = {
   description: string
 }
 
-// 2. Your page component
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const { slug } = params
+export default async function CategoryPage({
+  params,
+}: {
+  // 2. Next.js now passes params as a Promise
+  params: Promise<{ slug: string }>
+}) {
+  // 3. Await the params before you destructure
+  const { slug } = await params
 
-  // 3. Use <Photo[]> for the return type!
+  // 4. Fetch typed data directly as Photo[]
   const photos = await sanityFetch<Photo[]>({
     query: photosByCategorySlugQuery,
     params: { slug },
@@ -22,12 +28,15 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-10">
-      {(photos || []).map(photo => (
-        <div key={photo._id} className="overflow-hidden rounded shadow hover:shadow-lg">
+      {photos.map((photo) => (
+        <div
+          key={photo._id}
+          className="overflow-hidden rounded shadow hover:shadow-lg"
+        >
           {photo.imageUrl && (
             <Image
               src={photo.imageUrl}
-              alt={photo.title || ''}
+              alt={photo.title}
               width={500}
               height={350}
               className="w-full h-60 object-cover"
