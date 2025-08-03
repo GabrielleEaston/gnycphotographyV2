@@ -1,37 +1,39 @@
 // app/categories/[slug]/page.tsx
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import { sanityFetch } from '@/sanity/lib/live';
-import { photosByCategorySlugQuery } from '@/sanity/lib/queries';
 
-// 1) Define your Photo shape (or import it from your shared types file)
+import { notFound } from 'next/navigation'
+import Image from 'next/image'
+import { sanityFetch } from '@/sanity/lib/live'
+import { photosByCategorySlugQuery } from '@/sanity/lib/queries'
+
+// 1) Your Photo interface
 interface Photo {
-  _id: string;
-  title: string;
-  description?: string;
-  imageUrl?: string;
+  _id: string
+  title: string
+  description?: string
+  imageUrl?: string
 }
 
-// 2) Tell Next exactly what props this page gets
-interface PageProps {
-  params: { slug: string };
+// 2) PageProps now declares params as a Promise
+type PageProps = {
+  params: Promise<{ slug: string }>
 }
 
 export default async function CategoryPage({ params }: PageProps) {
-  const { slug } = params;
+  // 3) Await the params promise
+  const { slug } = await params
 
-  // 3) Use sanityFetch with two generics: the query type and the data shape
+  // 4) Fetch with your typed helper
   const { data: photos } = await sanityFetch<
     typeof photosByCategorySlugQuery,
     Photo[]
   >({
     query: photosByCategorySlugQuery,
     params: { slug },
-  });
+  })
 
-  // 4) If no photos, show a 404
+  // 5) 404 if nothing comes back
   if (!photos || photos.length === 0) {
-    notFound();
+    notFound()
   }
 
   return (
@@ -59,5 +61,5 @@ export default async function CategoryPage({ params }: PageProps) {
         </div>
       ))}
     </div>
-  );
+  )
 }
