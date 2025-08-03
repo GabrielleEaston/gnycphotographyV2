@@ -1,52 +1,25 @@
-// app/categories/[slug]/page.tsx
 import { sanityFetch } from '@/sanity/lib/live'
-import { photosByCategorySlugQuery } from '@/sanity/lib/queries'
+import { categoriesQuery } from '@/sanity/lib/queries'
+import Link from 'next/link'
 import Image from 'next/image'
 
-// 1. Define your Photo shape
-type Photo = {
-  _id: string
-  title: string
-  imageUrl: string
-  description: string
-}
-
-export default async function CategoryPage({
-  params,
-}: {
-  // 2. Next.js now passes params as a Promise
-  params: Promise<{ slug: string }>
-}) {
-  // 3. Await the params before you destructure
-  const { slug } = await params
-
-  // 4. Fetch typed data directly as Photo[]
-  const photos = await sanityFetch<Photo[]>({
-    query: photosByCategorySlugQuery,
-    params: { slug },
-  })
+export default async function CategoriesPage() {
+  const { data: categories } = await sanityFetch({ query: categoriesQuery })
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-10">
-      {photos.map((photo) => (
-        <div
-          key={photo._id}
-          className="overflow-hidden rounded shadow hover:shadow-lg"
-        >
-          {photo.imageUrl && (
-            <Image
-              src={photo.imageUrl}
-              alt={photo.title}
-              width={500}
-              height={350}
-              className="w-full h-60 object-cover"
-            />
-          )}
-          <div className="p-2">
-            <h3 className="text-lg">{photo.title}</h3>
-            <p className="text-gray-500">{photo.description}</p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-10">
+      {categories?.map(cat => (
+        <Link key={cat._id} href={`/categories/${cat.slug}`}>
+          <div className="border rounded-lg overflow-hidden hover:shadow-xl transition">
+            {cat.thumbnailUrl && (
+              <Image src={cat.thumbnailUrl} alt={cat.title} width={400} height={300} className="w-full h-60 object-cover" />
+            )}
+            <div className="p-4">
+              <h2 className="text-xl font-semibold">{cat.title}</h2>
+              <p className="text-gray-600">{cat.description}</p>
+            </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   )
