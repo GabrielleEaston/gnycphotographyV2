@@ -19,10 +19,12 @@ export default async function CategoryPage({
   const { slug } = await params
 
   // sanityFetch only takes one generic (the data shape), not two
-  const { data: photos } = await sanityFetch<Photo[]>({
-    query: photosByCategorySlugQuery,
-    params: { slug },
-  })
+  const { data: photos } = await sanityFetch({
+  query: photosByCategorySlugQuery,
+  params: { slug },
+})
+// tell TS “I know this is Photo[]”
+const typedPhotos = photos as Photo[]
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-10">
