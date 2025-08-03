@@ -1,9 +1,13 @@
 // app/categories/[slug]/page.tsx
 
-import { notFound } from 'next/navigation'
-import Image from 'next/image'
-import { sanityFetch } from '@/sanity/lib/live'
-import { photosByCategorySlugQuery } from '@/sanity/lib/queries'
+import { notFound } from "next/navigation"
+import Image from "next/image"
+import { sanityFetch } from "@/sanity/lib/live"
+import { photosByCategorySlugQuery } from "@/sanity/lib/queries"
+
+type Props = {
+  params: Promise<{ slug: string }>
+}
 
 interface Photo {
   _id: string
@@ -12,14 +16,9 @@ interface Photo {
   imageUrl?: string
 }
 
-type PageProps = {
-  params: Promise<{ slug: string }>
-}
-
-export default async function CategoryPage({ params }: PageProps) {
+export default async function CategoryPage({ params }: Props) {
   const { slug } = await params
 
-  // ← only one generic here!
   const { data: photos } = await sanityFetch<Photo[]>({
     query: photosByCategorySlugQuery,
     params: { slug },
