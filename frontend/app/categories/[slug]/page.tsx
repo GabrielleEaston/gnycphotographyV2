@@ -1,33 +1,40 @@
 // app/categories/[slug]/page.tsx
 
-import { notFound } from "next/navigation"
-import Image from "next/image"
-import { sanityFetch } from "@/sanity/lib/live"
-import { photosByCategorySlugQuery } from "@/sanity/lib/queries"
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import { sanityFetch } from "@/sanity/lib/live";
+import { photosByCategorySlugQuery } from "@/sanity/lib/queries";
 
 type Props = {
-  params: Promise<{ slug: string }>
-}
+  params: Promise<{ slug: string }>;
+};
 
 interface Photo {
-  _id: string
-  title: string
-  description?: string
-  imageUrl?: string
+  _id: string;
+  title: string;
+  description?: string;
+  imageUrl?: string;
 }
 
 export default async function CategoryPage({ params }: Props) {
-  const { slug } = await params
+  // 1) unwrap the slug promise
+  const { slug } = await params;
 
-  const { data: photos } = await sanityFetch<Photo[]>({
+  // 2) fetch your photos (no generics here)
+  const { data } = await sanityFetch({
     query: photosByCategorySlugQuery,
     params: { slug },
-  })
+  });
 
-  if (!photos || photos.length === 0) {
-    notFound()
+  // 3) cast to your Photo[] shape
+  const photos = data as Photo[];
+
+  // 4) 404 if nothing returned
+  if (!photos?.length) {
+    notFound();
   }
 
+  // 5) render your grid
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-10">
       {photos.map((photo) => (
@@ -53,5 +60,5 @@ export default async function CategoryPage({ params }: Props) {
         </div>
       ))}
     </div>
-  )
+  );
 }
