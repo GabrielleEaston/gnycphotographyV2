@@ -2,15 +2,14 @@ import { sanityFetch } from '@/sanity/lib/live'
 import { photosByCategorySlugQuery } from '@/sanity/lib/queries'
 import Image from 'next/image'
 
-// This is the correct type (no need to import PageProps)
-type Props = {
-  params: {
-    slug: string
-  }
-}
+export default async function CategoryPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  // Await params per Next.js 15+ App Router server component signature
+  const { slug } = await params
 
-export default async function CategoryPage({ params }: Props) {
-  const { slug } = params
   const { data: photos } = await sanityFetch({
     query: photosByCategorySlugQuery,
     params: { slug },
