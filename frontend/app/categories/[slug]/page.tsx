@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { sanityFetch } from '@/sanity/lib/live'
 import { photosByCategorySlugQuery } from '@/sanity/lib/queries'
 
-// 1) Your Photo interface
 interface Photo {
   _id: string
   title: string
@@ -13,25 +12,19 @@ interface Photo {
   imageUrl?: string
 }
 
-// 2) PageProps now declares params as a Promise
 type PageProps = {
   params: Promise<{ slug: string }>
 }
 
 export default async function CategoryPage({ params }: PageProps) {
-  // 3) Await the params promise
   const { slug } = await params
 
-  // 4) Fetch with your typed helper
-  const { data: photos } = await sanityFetch<
-    typeof photosByCategorySlugQuery,
-    Photo[]
-  >({
+  // ← only one generic here!
+  const { data: photos } = await sanityFetch<Photo[]>({
     query: photosByCategorySlugQuery,
     params: { slug },
   })
 
-  // 5) 404 if nothing comes back
   if (!photos || photos.length === 0) {
     notFound()
   }
