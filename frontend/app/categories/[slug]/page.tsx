@@ -1,58 +1,38 @@
 // app/categories/[slug]/page.tsx
+import { sanityFetch } from "@/sanity/lib/live"
+import { photosByCategorySlugQuery } from "@/sanity/lib/queries"
+import Image from "next/image"
 
-import { sanityFetch } from '@/sanity/lib/live'
-import { photosByCategorySlugQuery } from '@/sanity/lib/queries'
-import Image from 'next/image'
-import React from 'react'
-
-// adjust this to wherever your Photo type lives
-type Photo = {
-  _id: string
-  title: string
-  imageUrl: string
-  description?: string
+// 1) Correct the PageProps
+type PageProps = {
+  params: { slug: string }
 }
 
-export default async function CategoryPage({
-  params,
-}: {
-  // In RSC dynamic routes, Next.js passes params as a Promise
-  params: Promise<{ slug: string }>
-}) {
-  // await the params before destructuring
-  const { slug } = await params
+export default async function CategoryPage({ params }: PageProps) {
+  const { slug } = params
 
-  // fetch with two generics: <ParamsShape, DataShape>
-  const { data: photos } = await sanityFetch<
-    { slug: string },  // params type
-    Photo[]            // data type
-  >({
-    query:   photosByCategorySlugQuery,
-    params:  { slug },
+  // 2) No two generics here — just let it infer (or use one if you want)
+  const { data: photos } = await sanityFetch({
+    query: photosByCategorySlugQuery,
+    params: { slug },
   })
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-10">
-      {(photos || []).map((photo) => (
-        <div
-          key={photo._id}
-          className="overflow-hidden rounded-lg shadow hover:shadow-lg transition"
-        >
+      {(photos || []).map((photo: any) => (
+        <div key={photo._id} className="overflow-hidden rounded shadow hover:shadow-lg">
           {photo.imageUrl && (
             <Image
               src={photo.imageUrl}
-              alt={photo.title || ''}
+              alt={photo.title || ""}
               width={500}
               height={350}
               className="w-full h-60 object-cover"
-              priority={false}
             />
           )}
-          <div className="p-4">
+          <div className="p-2">
             <h3 className="text-lg font-semibold">{photo.title}</h3>
-            {photo.description && (
-              <p className="mt-2 text-gray-500">{photo.description}</p>
-            )}
+            <p className="text-gray-500">{photo.description}</p>
           </div>
         </div>
       ))}
