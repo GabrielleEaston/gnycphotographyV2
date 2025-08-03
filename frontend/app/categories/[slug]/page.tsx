@@ -2,7 +2,6 @@ import { sanityFetch } from '@/sanity/lib/live'
 import { photosByCategorySlugQuery } from '@/sanity/lib/queries'
 import Image from 'next/image'
 
-// This is the important change!
 interface PageProps {
   params: {
     slug: string;
