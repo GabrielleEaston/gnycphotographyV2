@@ -3,6 +3,12 @@ import { sanityFetch } from "@/sanity/lib/live"
 import { photosByCategorySlugQuery } from "@/sanity/lib/queries"
 import Image from "next/image"
 
+interface Photo {
+  _id: string
+  title: string
+  description?: string
+  imageUrl: string
+}
 // No need to re–declare Next’s PageProps; just inline it:
 export default async function CategoryPage({
   params,
