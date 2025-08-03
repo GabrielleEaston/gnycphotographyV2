@@ -1,30 +1,38 @@
 // app/categories/[slug]/page.tsx
-import { sanityFetch } from "@/sanity/lib/live"
-import { photosByCategorySlugQuery } from "@/sanity/lib/queries"
-import Image from "next/image"
+import { sanityFetch } from '@/sanity/lib/live'
+import { photosByCategorySlugQuery } from '@/sanity/lib/queries'
+import Image from 'next/image'
 
-// 1) Correct the PageProps
-type PageProps = {
-  params: { slug: string }
+// (Optional) Your own TS interfaces
+interface Photo {
+  _id: string
+  title?: string
+  description?: string
+  imageUrl?: string
 }
 
-export default async function CategoryPage({ params }: PageProps) {
-  const { slug } = params
+type Props = { params: { slug: string } }
 
-  // 2) No two generics here — just let it infer (or use one if you want)
-  const { data: photos } = await sanityFetch({
+export default async function Page({ params }: Props) {
+  const { slug } = params
+  // Fetch all photos in this category
+  const { data } = await sanityFetch({
     query: photosByCategorySlugQuery,
     params: { slug },
   })
+  const photos = (data as Photo[]) || []
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-10">
-      {(photos || []).map((photo: any) => (
-        <div key={photo._id} className="overflow-hidden rounded shadow hover:shadow-lg">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-10">
+      {photos.map((photo) => (
+        <div
+          key={photo._id}
+          className="overflow-hidden rounded shadow hover:shadow-lg transition"
+        >
           {photo.imageUrl && (
             <Image
               src={photo.imageUrl}
-              alt={photo.title || ""}
+              alt={photo.title || ''}
               width={500}
               height={350}
               className="w-full h-60 object-cover"
@@ -32,7 +40,9 @@ export default async function CategoryPage({ params }: PageProps) {
           )}
           <div className="p-2">
             <h3 className="text-lg font-semibold">{photo.title}</h3>
-            <p className="text-gray-500">{photo.description}</p>
+            {photo.description && (
+              <p className="text-gray-500">{photo.description}</p>
+            )}
           </div>
         </div>
       ))}
