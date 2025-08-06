@@ -1,64 +1,34 @@
 // app/categories/[slug]/page.tsx
-
-import { notFound } from "next/navigation";
-import Image from "next/image";
-import { sanityFetch } from "@/sanity/lib/live";
-import { photosByCategorySlugQuery } from "@/sanity/lib/queries";
+import { notFound } from "next/navigation"
+import { sanityFetch } from "@/sanity/lib/live"
+import { photosByCategorySlugQuery } from "@/sanity/lib/queries"
+import PhotoGallery, { LightboxImage } from "./PhotoGallery"
 
 type Props = {
-  params: Promise<{ slug: string }>;
-};
-
-interface Photo {
-  _id: string;
-  title: string;
-  description?: string;
-  imageUrl?: string;
+  params: Promise<{ slug: string }>
 }
 
 export default async function CategoryPage({ params }: Props) {
-  // 1) unwrap the slug promise
-  const { slug } = await params;
+  // 1) unwrap the slug
+  const { slug } = await params
 
-  // 2) fetch your photos (no generics here)
+  // 2) fetch
   const { data } = await sanityFetch({
     query: photosByCategorySlugQuery,
     params: { slug },
-  });
+  })
 
-  // 3) cast to your Photo[] shape
-  const photos = data as Photo[];
+  // 3) cast & 404
+  const photos = (data as any[]).map((p) => ({
+    src: p.imageUrl!,
+    title: p.title,
+    description: p.description,
+  })) as LightboxImage[]
 
-  // 4) 404 if nothing returned
-  if (!photos?.length) {
-    notFound();
+  if (!photos.length) {
+    notFound()
   }
 
-  // 5) render your grid
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-10">
-      {photos.map((photo) => (
-        <div
-          key={photo._id}
-          className="overflow-hidden rounded shadow hover:shadow-lg"
-        >
-          {photo.imageUrl && (
-            <Image
-              src={photo.imageUrl}
-              alt={photo.title}
-              width={500}
-              height={350}
-              className="w-full h-60 object-cover"
-            />
-          )}
-          <div className="p-2">
-            <h3 className="text-lg font-semibold">{photo.title}</h3>
-            {photo.description && (
-              <p className="text-gray-500">{photo.description}</p>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  // 4) render client gallery
+  return <PhotoGallery images={photos} />
 }
