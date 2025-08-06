@@ -8,7 +8,7 @@ import Image from 'next/image'
 
 export interface LightboxImage {
   src: string
-  title?: string
+  title: string
   description?: string
 }
 
@@ -31,7 +31,7 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
           >
             <Image
               src={img.src}
-              alt={img.title}
+              alt={img.title ?? ""}
               width={500}
               height={350}
               className="w-full h-60 object-cover"
