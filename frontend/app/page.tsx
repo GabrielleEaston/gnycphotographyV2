@@ -23,8 +23,6 @@ export default async function HomePage() {
     // keep it fresh while you’re iterating:
     stega: false,
     perspective: "published",
-    // @ts-ignore (depends on your helper) – force no cache during dev
-    revalidate: 0,
   });
 
   // 2b) Fetch and cast your categories
