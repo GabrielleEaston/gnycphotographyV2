@@ -2,11 +2,11 @@
 
 import Hero from './components/Hero'
 import Services from './components/Services'
-import Brands from './components/Brands'
 import { sanityFetch } from '@/sanity/lib/live'
 import { heroQuery, categoriesQuery, servicesQuery } from '@/sanity/lib/queries'
 import Link from 'next/link'
 import Image from 'next/image'
+import { CornerDownRight } from "lucide-react"; // ← NEW
 
 // 1) Describe the shape of each category
 interface Category {
@@ -18,57 +18,83 @@ interface Category {
 
 export default async function HomePage() {
   // 2a) Fetch your hero data (assumed correctly typed by Hero component)
-  const { data: heroData } = await sanityFetch({ query: heroQuery })
-  const hero = heroData
+   const { data: hero } = await sanityFetch({
+    query: heroQuery,
+    // keep it fresh while you’re iterating:
+    stega: false,
+    perspective: "published",
+    // @ts-ignore (depends on your helper) – force no cache during dev
+    revalidate: 0,
+  });
 
   // 2b) Fetch and cast your categories
   const { data: rawCategories } = await sanityFetch({ query: categoriesQuery })
   const categories = rawCategories as Category[]
 
   // 2c) Fetch and cast your services (you already typed ServicesProps)
-  const { data: rawServices } = await sanityFetch({ query: servicesQuery })
-  const services = rawServices
+  const { data: services } = await sanityFetch({ query: servicesQuery, perspective: "published", revalidate: 0 });
+
+
 
   return (
     <>
       {/* Hero section */}
-      <Hero {...hero} />
+        <Hero
+        headline={hero?.headline}      // PT array
+        heading={hero?.heading}        // plain string fallback
+        description={hero?.description}
+        cta={hero?.cta}
+      />
 
       {/* Categories Section */}
-      <section className="py-16 bg-gray-50">
-        <h2 className="text-center text-black text-sm font-semibold tracking-widest mb-16 uppercase">
-          Categories
-        </h2>
-        <div className="mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-12">
-          {categories.map((cat) => (
-            <div key={cat._id} className="flex flex-col items-center">
-              <Link href={`/categories/${cat.slug}`} className="block group w-full">
-                <div className="aspect-square overflow-hidden">
-                  {cat.thumbnailUrl && (
-                    <Image
-                      src={cat.thumbnailUrl}
-                      alt={cat.title}
-                      width={400}
-                      height={400}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                  )}
-                </div>
+      <section id="work" className="section-pad bg-white">
+  <div className="site-container container py-16">
+    <h2 className="cat-heading">CATEGORIES</h2>
+
+    <div className="cat-layout">
+      {/* Left: list with rules + arrow */}
+      <nav aria-label="Categories" className="cat-list">
+        <ul>
+          {categories.map((c, i) => (
+            <li key={c._id}>
+              <Link href={`/categories/${c.slug}`} className="categories-link">
+                <span>{c.title}</span>
+                <CornerDownRight aria-hidden className="arrow-icon" />
               </Link>
-              <Link
-                href={`/categories/${cat.slug}`}
-                className="mt-8 text-center text-black text-xl font-serif hover:underline"
-              >
-                {cat.title}
-              </Link>
-            </div>
+              {i < categories.length - 1 && <div className="cat-rule" />}
+            </li>
           ))}
-        </div>
-      </section>
+        </ul>
+      </nav>
+
+      {/* Right: grid of square thumbs (3×2 on desktop, 2× on mobile) */}
+      <div className="cat-grid">
+        {categories.slice(0, 6).map((c) => (
+          <Link
+            key={c._id}
+            href={`/categories/${c.slug}`}
+            aria-label={c.title}
+            className="cat-card"
+          >
+            <div className="cat-thumb">
+              {c.thumbnailUrl && (
+                <Image
+                  src={c.thumbnailUrl}
+                  alt={c.title}
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 350px"
+                />
+              )}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Services & Brands */}
-      <Services services={services} />
-      <Brands />
+      <Services services={services ?? []} />
     </>
   )
 }

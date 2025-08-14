@@ -59,25 +59,22 @@ export default async function Page(props: Props) {
   }
 
   return (
-    <div className="my-12 lg:my-24">
+    <div className="py-12">
       <Head>
         <title>{page.heading}</title>
       </Head>
-      <div className="">
-        <div className="container">
-          <div className="pb-6 border-b border-gray-100">
-            <div className="max-w-3xl">
-              <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-7xl">
-                {page.heading}
-              </h2>
-              <p className="mt-4 text-base lg:text-lg leading-relaxed text-gray-600 uppercase font-light">
-                {page.subheading}
-              </p>
-            </div>
-          </div>
-        </div>
+      <main className="section-pad">
+      {/* Align with header/hero */}
+      <div className="container">
+        <header className="mb-8">
+          <h1 className="page-title">{page.heading}</h1>
+          {page.subheading && <p className="page-lead">{page.subheading}</p>}
+        </header>
+
+        {/* Your builder content */}
+        <PageBuilderPage page={page as GetPageQueryResult} />
       </div>
-      <PageBuilderPage page={page as GetPageQueryResult} />
+    </main>
     </div>
   );
 }

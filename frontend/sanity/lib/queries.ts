@@ -17,15 +17,14 @@ export const headerQuery = `
 `
 
 
-export const heroQuery = `
-  *[_type == "hero"][0]{
-    heading,
-    description,
-    "imageUrl": image.asset->url,
-    imageDisplayMode,
-    cta { title, url }
-  }
-`
+export const heroQuery = /* groq */ `
+*[_type == "hero"] | order(_updatedAt desc)[0]{
+  headline,            
+  heading,             
+  description,
+  cta { title, url }
+}
+`;
 
 export const categoriesQuery = `
   *[_type == "category"] | order(title asc){
@@ -58,14 +57,15 @@ const postFields = /* groq */ `
 `;
 
 // /sanity/lib/queries.ts
-export const servicesQuery = `
-  *[_type == "service"] | order(title asc){
-    _id,
-    title,
-    description,
-    "iconUrl": icon.asset->url
-  }
-`
+export const servicesQuery = /* groq */ `
+*[_type == "service"] | order(coalesce(order, 9999) asc, title asc){
+  _id,
+  title,
+  "summary": coalesce(summary, description),  // fall back to description if needed
+  category
+}
+`;
+
 
 const linkReference = /* groq */ `
   _type == "link" => {

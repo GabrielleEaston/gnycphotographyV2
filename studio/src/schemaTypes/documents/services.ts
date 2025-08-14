@@ -1,14 +1,14 @@
 // /sanity/schemaTypes/documents/service.ts
 import { defineType, defineField } from 'sanity'
 
-export default defineType({
-  name: 'service',
-  type: 'document',
-  title: 'Service',
+export default {
+  name: "service",
+  title: "Service",
+  type: "document",
   fields: [
-    defineField({ name: 'title', type: 'string', title: 'Title' }),
-    defineField({ name: 'description', type: 'text', title: 'Description' }),
-    defineField({ name: 'icon', type: 'image', title: 'Icon (optional)' }),
-    // add more fields as needed
-  ]
-})
+    { name: "title", title: "Title", type: "string", validation: (R:any)=>R.required() },
+    { name: "summary", title: "Short description (one line)", type: "string" }, // <-- shows under title
+    { name: "category", title: "Category", type: "string", options: { list: ["People","Places","Brand"] }, validation:(R:any)=>R.required() }, // <-- left rail tab
+    { name: "order", title: "Order", type: "number" },
+  ],
+};
