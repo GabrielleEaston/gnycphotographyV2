@@ -1,6 +1,6 @@
 // components/Hero.tsx
 import Link from "next/link";
-import { PortableText } from "@portabletext/react";
+import { PortableText, type PortableTextComponents } from "@portabletext/react";
 
 type CTA = { title: string; url: string };
 
@@ -11,18 +11,21 @@ export type HeroProps = {
   cta?: CTA;
 };
 
-// Portable Text components
-const ptComponents = {
+// Portable Text components (typed)
+// Keep your classes & behavior the same
+const ptComponents: PortableTextComponents = {
   marks: {
-    em: ({ children }: { children: React.ReactNode }) => <em>{children}</em>,
-    link: ({ value, children }: any) => {
-      const href = value?.href || "#";
+    em: ({ children }) => <em>{children}</em>,
+    link: ({ value, children }) => {
+      const href = (value as any)?.href || "#";
       const isExternal = /^https?:\/\//.test(href);
+      const openNew = (value as any)?.blank || isExternal;
+
       return (
         <Link
           href={href}
-          target={value?.blank || isExternal ? "_blank" : undefined}
-          rel={value?.blank || isExternal ? "noopener noreferrer" : undefined}
+          target={openNew ? "_blank" : undefined}
+          rel={openNew ? "noopener noreferrer" : undefined}
           className="hero-link"
         >
           {children}
@@ -31,16 +34,11 @@ const ptComponents = {
     },
   },
   block: {
-    normal: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    normal: ({ children }) => <>{children}</>,
   },
 };
 
-export default function Hero({
-  headline,
-  heading,
-  description,
-  cta,
-}: HeroProps) {
+export default function Hero({ headline, heading, description, cta }: HeroProps) {
   if (!headline && !heading && !description && !cta?.title) {
     return (
       <div className="py-16 text-center text-red-500">
@@ -60,9 +58,7 @@ export default function Hero({
           )}
         </h1>
 
-        {description && (
-          <p className="mt-6 max-w-3xl">{description}</p>
-        )}
+        {description && <p className="mt-6 max-w-3xl">{description}</p>}
 
         {cta?.title && cta.url && (
           <Link
