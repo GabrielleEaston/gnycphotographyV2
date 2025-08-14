@@ -30,7 +30,7 @@ export default async function HomePage() {
   const categories = rawCategories as Category[]
 
   // 2c) Fetch and cast your services (you already typed ServicesProps)
-  const { data: services } = await sanityFetch({ query: servicesQuery, perspective: "published", revalidate: 0 });
+  const { data: services } = await sanityFetch({ query: servicesQuery, perspective: "published" });
 
 
 
