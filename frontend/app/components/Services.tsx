@@ -19,7 +19,13 @@ const labelize = (n: string) =>
   n === "all"    ? "All"    :
   n.charAt(0).toUpperCase() + n.slice(1);
 
-export default function Services({ services, title = "SERVICES" }: { services: Service[]; title?: string }) {
+export default function Services({
+  services,
+  title = "SERVICES",
+}: {
+  services: Service[];
+  title?: string;
+}) {
   // Build groups and unique, ordered tabs
   const { groups, tabs } = useMemo(() => {
     const groups: Record<string, Service[]> = {};
@@ -41,9 +47,11 @@ export default function Services({ services, title = "SERVICES" }: { services: S
     return { groups, tabs };
   }, [services]);
 
-  if (!services?.length) return null;
-
+  // ✅ Hooks must run unconditionally (no early return above)
   const [active, setActive] = useState<string>(tabs[0]);
+
+  // Now it's safe to short-circuit render if nothing to show
+  if (!services?.length) return null;
 
   return (
     <section id="services" className="section-pad bg-white">
@@ -72,16 +80,16 @@ export default function Services({ services, title = "SERVICES" }: { services: S
           </nav>
 
           {/* RIGHT: items for active category */}
-        <div className="services-list">
-  <div key={active} className="services-panel services-fade">
-    {(groups[active] || []).map((s) => (
-      <article key={s._id} className="service-item">
-        <h3 className="service-name">{s.title}</h3>
-        {s.summary && <p className="service-desc">{s.summary}</p>}
-      </article>
-    ))}
-  </div>
-</div>
+          <div className="services-list">
+            <div key={active} className="services-panel services-fade">
+              {(groups[active] || []).map((s) => (
+                <article key={s._id} className="service-item">
+                  <h3 className="service-name">{s.title}</h3>
+                  {s.summary && <p className="service-desc">{s.summary}</p>}
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
