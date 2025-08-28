@@ -73,6 +73,7 @@ export default function Services({
                     <span>{labelize(cat)}</span>
                     <CornerDownRight aria-hidden className="arrow-icon" />
                   </button>
+                  <div className="services-rule" />
                 </li>
               ))}
             </ul>
