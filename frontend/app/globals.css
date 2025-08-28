@@ -307,6 +307,7 @@ p,li{ font-size:var(--step-0); line-height:1.6; }
   padding: 10px 0;
   transition: ease-in-out 2ms;
   cursor: pointer;
+  border-bottom: 1px solid #000;
   
 }
 .services-link:hover{
